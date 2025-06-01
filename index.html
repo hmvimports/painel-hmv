@@ -33,9 +33,16 @@
     .acao {
       margin-top: 10px;
     }
+    input[type="text"], input[type="url"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
     button, input[type="file"] {
       padding: 10px;
-      margin-top: 5px;
+      margin-top: 10px;
       border: none;
       border-radius: 5px;
       background-color: #007bff;
@@ -45,12 +52,10 @@
     button:hover {
       background-color: #0056b3;
     }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
+    .success {
+      color: green;
       margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      display: none;
     }
   </style>
 </head>
@@ -59,11 +64,13 @@
 
   <div class="agente">
     <h2>1. Otimização de Anúncios</h2>
-    <p>Cole abaixo o link ou nome do produto que deseja otimizar.</p>
-    <div class="acao">
-      <input type="text" id="produtoInput" placeholder="Ex: https://shopee.com.br/produto123 ou 'Pote plástico 1000 ml'" />
-      <button onclick="copiarTexto()">Copiar para envio</button>
-    </div>
+    <p>Envie o nome ou link do produto para gerar título e descrição com IA.</p>
+    <form id="form-otimizacao">
+      <input type="text" name="produto" placeholder="Nome do produto" required />
+      <input type="url" name="link" placeholder="Link do produto (opcional)" />
+      <button type="submit">Enviar para IA</button>
+      <div class="success" id="success-msg">✅ Solicitação enviada com sucesso!</div>
+    </form>
   </div>
 
   <div class="agente">
@@ -99,17 +106,30 @@
   </div>
 
   <script>
-    function copiarTexto() {
-      const input = document.getElementById('produtoInput');
-      const texto = input.value;
-      if (!texto) {
-        alert("Por favor, insira o link ou nome do produto.");
-        return;
-      }
-      navigator.clipboard.writeText(texto).then(() => {
-        alert("Texto copiado! Agora cole aqui no ChatGPT para gerar a otimização.");
+    document.getElementById("form-otimizacao").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const produto = this.produto.value;
+      const link = this.link.value;
+      const webhookURL = "https://hook.us1.make.com/nzct1sxkrs3njyzazko50ez9f4iknkhd";
+
+      fetch(webhookURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          produto,
+          link
+        })
+      })
+      .then(res => {
+        if (res.ok) {
+          document.getElementById("success-msg").style.display = "block";
+          this.reset();
+        }
       });
-    }
+    });
   </script>
 </body>
 </html>
